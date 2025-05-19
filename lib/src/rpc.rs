@@ -1,9 +1,9 @@
-use std::{ops::Deref, fmt};
 use solana_client::rpc_client::RpcClient;
 use solana_commitment_config::CommitmentConfig;
+use std::{fmt, ops::Deref};
 
-pub struct Rpc{
-  pub client: RpcClient,
+pub struct Rpc {
+    pub client: RpcClient,
 }
 
 impl Deref for Rpc {
@@ -14,15 +14,15 @@ impl Deref for Rpc {
     }
 }
 
-impl Rpc{
-  pub fn new(url: &str)-> Self {
-    Self::new_with_commitment(url, CommitmentConfig::confirmed())
-  }
+impl Rpc {
+    pub fn new(url: &str) -> Self {
+        Self::new_with_commitment(url, CommitmentConfig::confirmed())
+    }
 
-  pub fn new_with_commitment(url: &str, commitment: CommitmentConfig ) -> Self{
-    let client = RpcClient::new_with_commitment(url.to_string(), commitment);
-    Self {client}
-  }
+    pub fn new_with_commitment(url: &str, commitment: CommitmentConfig) -> Self {
+        let client = RpcClient::new_with_commitment(url.to_string(), commitment);
+        Self { client }
+    }
 }
 
 // impl fmt::Debug for Rpc{
@@ -32,4 +32,3 @@ impl Rpc{
 //        .finish()
 //   }
 // }
-
