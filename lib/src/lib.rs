@@ -1,8 +1,11 @@
 pub mod create_solana_client;
 pub mod rpc;
+pub mod transaction;
 
-pub use rpc::Rpc;
 pub use create_solana_client::SolanaClient;
+pub use rpc::Rpc;
+
+pub use solana_commitment_config::CommitmentConfig;
 
 pub fn testing() {
     let client = SolanaClient::new("http:://localhost:3040");
