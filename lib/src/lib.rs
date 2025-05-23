@@ -4,6 +4,7 @@ pub mod transaction;
 
 pub use create_solana_client::SolanaClient;
 pub use rpc::Rpc;
+pub use transaction::TxBuilder;
 
 pub use solana_commitment_config::CommitmentConfig;
 

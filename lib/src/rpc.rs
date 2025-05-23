@@ -14,7 +14,7 @@ use solana_transaction::Transaction;
 use std::{fmt, ops::Deref};
 
 pub struct Rpc {
-    pub client: RpcClient,
+    client: RpcClient,
 }
 
 impl Deref for Rpc {
