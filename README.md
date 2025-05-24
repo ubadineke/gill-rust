@@ -46,7 +46,19 @@ For troubleshooting and debugging your Solana transactions, see [Debug mode](#de
 > You can also consult the documentation for Anza's [JavaScript client](https://github.com/anza-xyz/solana-web3.js)
 > library for more information and helpful resources.
 
-## Using the modular crates from Anza
+### Using the modular crates from Anza
+
+## Generating Keypairs and Signers
+
+For most "signing" transactions, you'll need a Keypair instance, which can be used to sign transactions and messages.
+
+```rust
+use gill::{Keypair, Signer};
+
+const signer = Keypair::new();
+```
+
+> Ensure you import the `Signer` trait as it contains necessary methods to facilitate signing
 
 ## Create a Solana RPC connection
 
@@ -145,4 +157,5 @@ let signature = client.rpc.send_and_confirmed_transaction(signed_tx);
 ```
 
 Set custom config
+
 Coming soon!

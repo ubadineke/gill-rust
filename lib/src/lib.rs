@@ -1,18 +1,16 @@
-pub mod create_solana_client;
+pub mod solana_client;
 pub mod rpc;
 pub mod transaction;
 
-pub use create_solana_client::SolanaClient;
+pub use solana_client::SolanaClient;
 pub use rpc::Rpc;
 pub use transaction::TxBuilder;
+pub use solana_keypair::Keypair;
+pub use solana_signer::Signer;
 
 pub use solana_commitment_config::CommitmentConfig;
 
 pub fn testing() {
-    let client = SolanaClient::new("http:://localhost:3040");
-    println!("LEt's play");
-    let blockhash = client.rpc.get_latest_blockhash().unwrap();
-    println!("{:?}", blockhash);
 }
 
 #[cfg(test)]
