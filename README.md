@@ -23,7 +23,7 @@ cargo add gill
 - [Get a Solana Explorer link](#get-a-solana-explorer-link-for-transactions-accounts-or-blocks)
 - [Calculate minimum rent balance for an account](#calculate-minimum-rent-for-an-account)
 - [Generating keypairs and signers](#generating-keypairs-and-signers)
-- [Generating extractable keypairs and signers](#generating-extractable-keypairs-and-signers)
+<!-- - [Generating extractable keypairs and signers](#generating-extractable-keypairs-and-signers) -->
 
 <!-- You can also find some [NodeJS specific helpers](#node-specific-imports) like: -->
 
@@ -159,3 +159,36 @@ let signature = client.rpc.send_and_confirmed_transaction(signed_tx);
 Set custom config
 
 Coming soon!
+
+## Loading a keypair from a file
+
+```rust
+use gill::{Keypair, KeypairExt};
+
+const signer = Keypair::from_default_file();
+```
+
+> Ensure you import the `KeypairExt` trait as it contains extended functionality on the Keypair component
+
+Load a `Keypair` from a filesystem wallet json file, like those output from the [Solana CLI](https://solana.com/docs/intro/installation#install-the-solana-cli) (i.e. a JSON array of numbers).
+
+By default, the keypair file loaded is the Solana CLI's default keypair: ~/.config/solana/id.json
+
+To load a Signer from a specific filepath:
+
+```rust
+use gill::Keypair;
+
+let signer = Keypair::from_default_file(path);
+```
+
+## Saving a keypair to a file
+
+Save a Keypair to a local json file(e.g keypair.json)
+
+```rust
+use gill::Keypair;
+
+let signer = Keypair::new();
+signer.write_to_file(path);
+```
