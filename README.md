@@ -55,7 +55,7 @@ For most "signing" transactions, you'll need a Keypair instance, which can be us
 ```rust
 use gill::{Keypair, Signer};
 
-const signer = Keypair::new();
+let signer = Keypair::new();
 ```
 
 > Ensure you import the `Signer` trait as it contains necessary methods to facilitate signing
@@ -125,7 +125,7 @@ let tx = TxBuilder::new(
 
 ### Versioned Transaction
 
-Coming soon!
+**COMING SOON!**
 
 ## Signing Transactions
 
@@ -133,39 +133,129 @@ Coming soon!
 
 use gill::TxBuilder;
 
-const tx = TxBuilder::new(...);
-const signed_tx = tx.sign(signers, latest_blockhash);
+let tx = TxBuilder::new(...);
+let signed_tx = tx.sign(signers, latest_blockhash);
 ```
 
 ## Simulating transactions
 
-Coming soon!
+**COMING SOON!**
 
-### Sending and confirming transactions
+## Sending and confirming transactions
 
 To send and confirm a transaction to the blockchain, you can use the sendAndConfirmTransaction method from the initialized SolanaClient.
-The default commitment level is processed, to set another level check out - coming soon!
+The default commitment level is processed, to set another level check out - **COMING SOON!**
 
 ```rust
 use gill::{...};
 
 let client = SolanaClient::new("devnet");
-const tx = TxBuilder::new(...);
-const signed_tx = tx.sign(...);
+let tx = TxBuilder::new(...);
+let signed_tx = tx.sign(...);
 
 let signature = client.rpc.send_and_confirmed_transaction(signed_tx);
 ```
 
 Set custom config
 
-Coming soon!
+**COMING SOON!**
+
+## Get the signature from a signed transaction
+
+After you have a transaction signed by the `feePayer` (either a partially or fully signed transaction), you can get the
+transaction signature as follows:
+
+```rust
+use gill::TxBuilder;
+
+let tx = TxBuilder::new(...);
+let signed_tx = tx.sign(...);
+
+let signature = signed_tx.signatures[0];
+```
+
+> Note: After a transaction has been signed by the fee payer, it will have a transaction signature (aka transaction id).
+> This is due to Solana transaction ids are the first item in the transaction's `signatures` array. Therefore, client
+> applications can potentially know the signature before it is even sent to the network for confirmation.
+
+## Get a Solana Explorer link for transactions, accounts, or blocks
+
+Craft a Solana Explorer link for transactions, accounts, or blocks on any cluster.
+
+### Get a Solana Explorer link for a transaction
+
+To get an explorer link for a transaction's signature (aka transaction id):
+
+```rust
+use gill::TxBuilder;
+
+let url = TxBuilder::get_explorer_link_transaction(cluster, signature);
+```
+
+> The `cluster` parameter accepts custom urls and the known monikers(i.e devnet, mainnet, localnet)
+
+If you have a partially or fully signed transaction, you can get the Explorer link before even sending the transaction to the network:
+
+> See [`Get Signature from a Signed Transaction`](#get-the-signature-from-a-signed-transaction) for better understanding.
+
+```rust
+use gill::TxBuilder;
+
+let tx = TxBuilder::new(...);
+let signed_tx = tx.sign(...);
+let url = TxBuilder::get_explorer_link_transaction("localnet", &signed_tx.signatures[0].to_string())
+```
+
+**COMING SOON!**
+
+### Get a Solana Explorer link for an account
+
+To get an explorer link for an account on Solana's devnet:
+
+```rust
+use gill::TxBuilder;
+
+let url = TxBuilder::get_explorer_link_account("devnet", "Bf8PxxWt7UTvNGcrDyNwQiERSwNroa4pEo1pxwKo17Uh");
+```
+
+### Get a Solana Explorer link for a block
+
+To get an explorer link for a block:
+
+```rust
+use gill::TxBuilder;
+
+let url = TxBuilder::get_explorer_link_block("localnet", 2345);
+```
+
+## Calculate minimum rent for an account
+
+To calculate the minimum rent balance for an account (aka data storage deposit fee):
+
+#### For default rent
+
+```rust
+use gill::Rent;
+
+let rent = Rent::default().minimum_balance(0);
+// Expected value: 890880
+```
+
+#### Rent for specified number of bytes
+
+```rust
+use gill::Rent;
+
+let rent = Rent::default().minimum_balance(50);
+// Expected value: 1238880
+```
 
 ## Loading a keypair from a file
 
 ```rust
 use gill::{Keypair, KeypairExt};
 
-const signer = Keypair::from_default_file();
+let signer = Keypair::from_default_file();
 ```
 
 > Ensure you import the `KeypairExt` trait as it contains extended functionality on the Keypair component

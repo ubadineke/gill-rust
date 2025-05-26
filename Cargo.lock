@@ -978,10 +978,12 @@ dependencies = [
  "solana-keypair",
  "solana-message",
  "solana-pubkey",
+ "solana-rent",
  "solana-rpc-client-api",
  "solana-signature",
  "solana-signer",
  "solana-transaction",
+ "url",
 ]
 
 [[package]]

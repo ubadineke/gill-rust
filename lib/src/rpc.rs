@@ -37,9 +37,9 @@ impl Rpc {
 
     pub fn send_and_confirm_transaction(
         &self,
-        transaction: Transaction,
+        transaction: &Transaction,
     ) -> Result<Signature, ClientError> {
-        RpcClient::send_and_confirm_transaction(&self, &transaction)
+        RpcClient::send_and_confirm_transaction(&self, transaction)
     }
 }
 
