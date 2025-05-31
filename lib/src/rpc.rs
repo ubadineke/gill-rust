@@ -6,6 +6,7 @@ use solana_client::{
     },
     rpc_client::RpcClient,
     rpc_config::{RpcBlockSubscribeConfig, RpcBlockSubscribeFilter, RpcTransactionLogsFilter},
+    rpc_response::{Response, RpcSimulateTransactionResult},
 };
 use solana_commitment_config::CommitmentConfig;
 use solana_pubkey::Pubkey;
@@ -40,6 +41,13 @@ impl Rpc {
         transaction: &Transaction,
     ) -> Result<Signature, ClientError> {
         RpcClient::send_and_confirm_transaction(&self, transaction)
+    }
+
+    pub fn simulate_transaction(
+        &self,
+        transaction: &Transaction,
+    ) -> Result<Response<RpcSimulateTransactionResult>, ClientError> {
+        RpcClient::simulate_transaction(&self, transaction)
     }
 }
 

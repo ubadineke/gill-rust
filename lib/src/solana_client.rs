@@ -1,8 +1,8 @@
 use crate::rpc::{Rpc, RpcSubscriptions};
+use crate::utils::resolve_url;
 use anyhow::{Context, Result};
 use solana_commitment_config::CommitmentConfig;
 use std::fmt;
-use crate::utils::resolve_url;
 pub struct SolanaClient {
     pub rpc: Rpc,
     pub rpc_subscriptions: RpcSubscriptions,
@@ -23,7 +23,7 @@ impl SolanaClient {
     }
 
     pub fn new_with_commitment(moniker_or_url: &str, commitment_level: CommitmentConfig) -> Self {
-        let url = (moniker_or_url);
+        let url = resolve_url(moniker_or_url);
         let rpc = Rpc::new_with_commitment(url, commitment_level);
         let rpc_subscriptions = RpcSubscriptions::new(url);
         Self {
@@ -40,5 +40,3 @@ impl SolanaClient {
 //        .finish()
 //   }
 // }
-
-

@@ -139,7 +139,19 @@ let signed_tx = tx.sign(signers, latest_blockhash);
 
 ## Simulating transactions
 
-**COMING SOON!**
+To simulate a transaction on the blockchain, you can use the `simulate_transaction` method on the initialized `SolanaClient`
+
+```rust
+use gill::{...};
+
+let client = SolanaClient::new("devnet");
+let tx = TxBuilder::new(...);
+let signed_tx = tx.sign(...);
+
+let simulation = client.rpc.simulate_transaction(signed_tx);
+```
+
+Simulation with Custom Config: **COMING SOON!**
 
 ## Sending and confirming transactions
 

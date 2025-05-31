@@ -1,25 +1,39 @@
+use mpl_token_metadata::{
+    accounts::Metadata,
+    instructions::{CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs},
+    types::DataV2,
+};
 use solana_compute_budget_interface::ComputeBudgetInstruction;
 use solana_hash::Hash;
 use solana_instruction::Instruction;
 use solana_keypair::Keypair;
 use solana_message::Message;
+use solana_program::{program_pack::Pack, system_instruction, system_program, sysvar::Sysvar};
 use solana_pubkey::Pubkey;
+use solana_rent::Rent;
 use solana_signature::Signature;
+use solana_signer::Signer;
 use solana_transaction::Transaction;
+use spl_token::{instruction as token_instruction, state::Mint};
 use url::Url;
 
-
-pub struct TxBuilder{
-    message: Message
+pub struct TxBuilder {
+    message: Message,
 }
 
-impl TxBuilder{
-    pub fn new( 
+pub struct MetadataArgs {
+    pub name: String,
+    pub symbol: String,
+    pub uri: String,
+}
+
+impl TxBuilder {
+    pub fn new(
         fee_payer: &Pubkey,
         instructions: &[Instruction],
         compute_unit_limit: Option<u32>,
         compute_unit_price: Option<u64>,
-    ) -> Self{
+    ) -> Self {
         let mut all_instructions = vec![];
 
         if let Some(units) = compute_unit_limit {
@@ -28,18 +42,17 @@ impl TxBuilder{
         if let Some(price) = compute_unit_price {
             all_instructions.push(ComputeBudgetInstruction::set_compute_unit_price(price));
         }
-    
+
         all_instructions.extend(instructions.iter().cloned());
-    
+
         let message = Message::new(&all_instructions, Some(fee_payer));
 
-        Self{ message }
+        Self { message }
     }
 
-    pub fn sign(&self, signers: &[&Keypair], latest_blockhash: Hash) -> Transaction{
-        Transaction::new(signers, self.message.clone(), latest_blockhash) 
+    pub fn sign(&self, signers: &[&Keypair], latest_blockhash: Hash) -> Transaction {
+        Transaction::new(signers, self.message.clone(), latest_blockhash)
     }
-
 
     pub fn get_explorer_link_account(cluster: &str, address: &str) -> String {
         Self::build_url(cluster, &format!("/address/{}", address))
@@ -78,6 +91,64 @@ impl TxBuilder{
         }
 
         url.to_string()
+    }
+
+    pub fn build_create_transaction(
+        fee_payer: &Keypair,
+        latest_blockhash: Hash,
+        mint: &Keypair,
+        metadata: MetadataArgs,
+        decimals: u8,
+        token_program: &Pubkey,
+    ) -> Transaction {
+        //Instructions {
+        // Regular Token program
+        let instructions = [
+            // Create Account
+            system_instruction::create_account(
+                &fee_payer.pubkey(),
+                &mint.pubkey(),
+                Rent::default().minimum_balance(Mint::LEN),
+                Mint::LEN as u64,
+                token_program,
+            ),
+            // Initialize as mint
+            token_instruction::initialize_mint(
+                token_program,
+                &mint.pubkey(),
+                &fee_payer.pubkey(),
+                Some(&fee_payer.pubkey()),
+                decimals,
+            )
+            .unwrap(),
+            //Create Metadata instruction from metaplex
+            CreateMetadataAccountV3 {
+                metadata: Metadata::find_pda(&mint.pubkey()).0,
+                mint: mint.pubkey(),
+                mint_authority: fee_payer.pubkey(),
+                payer: fee_payer.pubkey(),
+                update_authority: (fee_payer.pubkey(), true),
+                system_program: system_program::ID,
+                rent: Some(solana_program::sysvar::rent::ID),
+            }
+            .instruction(CreateMetadataAccountV3InstructionArgs {
+                data: DataV2 {
+                    name: metadata.name,
+                    symbol: metadata.symbol,
+                    uri: metadata.uri,
+                    collection: None,
+                    creators: None,
+                    seller_fee_basis_points: 0,
+                    uses: None,
+                },
+                is_mutable: true,
+                collection_details: None,
+            }),
+        ];
+
+        let message = Message::new(&instructions, Some(&fee_payer.pubkey()));
+        Transaction::new(&[fee_payer, mint], message, latest_blockhash)
+        // }
     }
 }
 
