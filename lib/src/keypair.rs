@@ -1,6 +1,6 @@
 use solana_keypair::Keypair;
 use solana_signer::EncodableKey;
-use std::{fs::File, io::Read, path::Path};
+use std::fs::File;
 
 pub trait KeypairExt {
     fn from_default_file() -> Result<Self, Box<dyn std::error::Error>>

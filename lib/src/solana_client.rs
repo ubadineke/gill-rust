@@ -1,8 +1,6 @@
 use crate::rpc::{Rpc, RpcSubscriptions};
 use crate::utils::resolve_url;
-use anyhow::{Context, Result};
 use solana_commitment_config::CommitmentConfig;
-use std::fmt;
 pub struct SolanaClient {
     pub rpc: Rpc,
     pub rpc_subscriptions: RpcSubscriptions,

@@ -8,13 +8,18 @@ use solana_hash::Hash;
 use solana_instruction::Instruction;
 use solana_keypair::Keypair;
 use solana_message::Message;
-use solana_program::{program_pack::Pack, system_instruction, system_program, sysvar::Sysvar};
+use solana_program::{program_pack::Pack, system_instruction, system_program,};
 use solana_pubkey::Pubkey;
 use solana_rent::Rent;
-use solana_signature::Signature;
 use solana_signer::Signer;
 use solana_transaction::Transaction;
-use spl_token::{instruction as token_instruction, state::Mint};
+use spl_associated_token_account::{
+    get_associated_token_address, instruction::create_associated_token_account_idempotent,
+};
+use spl_token::{
+    instruction::{self as token_instruction, mint_to, transfer},
+    state::Mint,
+};
 use url::Url;
 
 pub struct TxBuilder {
@@ -25,6 +30,7 @@ pub struct MetadataArgs {
     pub name: String,
     pub symbol: String,
     pub uri: String,
+    pub is_mutable: bool
 }
 
 impl TxBuilder {
@@ -93,7 +99,7 @@ impl TxBuilder {
         url.to_string()
     }
 
-    pub fn build_create_transaction(
+    pub fn create_token_transaction(
         fee_payer: &Keypair,
         latest_blockhash: Hash,
         mint: &Keypair,
@@ -141,7 +147,7 @@ impl TxBuilder {
                     seller_fee_basis_points: 0,
                     uses: None,
                 },
-                is_mutable: true,
+                is_mutable: metadata.is_mutable,
                 collection_details: None,
             }),
         ];
@@ -149,6 +155,75 @@ impl TxBuilder {
         let message = Message::new(&instructions, Some(&fee_payer.pubkey()));
         Transaction::new(&[fee_payer, mint], message, latest_blockhash)
         // }
+    }
+
+    pub fn mint_token_transaction(
+        fee_payer: &Keypair,
+        latest_blockhash: Hash,
+        mint: &Keypair,
+        mint_authority: &Keypair,
+        amount: u64,
+        destination: &Pubkey,
+        token_program: &Pubkey,
+    ) -> Transaction {
+        let ata = get_associated_token_address(destination, &mint.pubkey());
+        let instructions = [
+            //instructions
+            // create idempotent will gracefully fail if the ata already exists. this is the gold standard!
+            create_associated_token_account_idempotent(
+                &fee_payer.pubkey(),
+                destination,
+                &mint.pubkey(),
+                token_program,
+            ),
+            //mint to account
+            mint_to(
+                token_program,
+                &mint.pubkey(),
+                &ata,
+                &mint_authority.pubkey(),
+                &[],
+                amount,
+            )
+            .unwrap(),
+        ];
+
+        let message = Message::new(&instructions, Some(&fee_payer.pubkey()));
+        Transaction::new(&[fee_payer, mint_authority], message, latest_blockhash)
+    }
+
+    pub fn transfer_token_transaction(
+        fee_payer: &Keypair,
+        latest_blockhash: Hash,
+        mint: &Keypair,
+        authority: &Keypair,
+        amount: u64,
+        destination: &Pubkey,
+        token_program: &Pubkey,
+    ) -> Transaction {
+        let source_ata = get_associated_token_address(&authority.pubkey(), &mint.pubkey());
+        let destination_ata = get_associated_token_address(destination, &mint.pubkey());
+        let instructions = [
+            //instructions
+            // create idempotent will gracefully fail if the ata already exists. this is the gold standard!
+            create_associated_token_account_idempotent(
+                &fee_payer.pubkey(),
+                destination,
+                &mint.pubkey(),
+                token_program,
+            ),
+            transfer(
+                token_program,
+                &source_ata,
+                &destination_ata,
+                &authority.pubkey(),
+                &[&authority.pubkey()],
+                amount,
+            )
+            .unwrap(),
+        ];
+        let message = Message::new(&instructions, Some(&fee_payer.pubkey()));
+        Transaction::new(&[fee_payer, authority], message, latest_blockhash)
     }
 }
 

@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-cargo add gill
+cargo add branchia
 ```
 
 ## Quick start
@@ -53,7 +53,7 @@ For troubleshooting and debugging your Solana transactions, see [Debug mode](#de
 For most "signing" transactions, you'll need a Keypair instance, which can be used to sign transactions and messages.
 
 ```rust
-use gill::{Keypair, Signer};
+use branchia::{Keypair, Signer};
 
 let signer = Keypair::new();
 ```
@@ -65,7 +65,7 @@ let signer = Keypair::new();
 Create a Solana `rpc` client for any RPC URL or standard Solana network moniker (i.e. devnet, localnet, mainnet etc) with a default commitment level of `confirmed`
 
 ```rust
-use gill::SolanaClient;
+use branchia::SolanaClient;
 
 let client = SolanaClient::new("devnet");
 ```
@@ -76,7 +76,7 @@ let client = SolanaClient::new("devnet");
 To create an RPC client with another commitment level:
 
 ```rust
-use gill::{SolanaClient, CommitmentConfig};
+use branchia::{SolanaClient, CommitmentConfig};
 
 let client = SolanaClient::new_with_commitment("localnet", CommitmentConfig::processed);
 ```
@@ -84,7 +84,7 @@ let client = SolanaClient::new_with_commitment("localnet", CommitmentConfig::pro
 To create an RPC client for an custom RPC provider or service:
 
 ```rust
-use gill::SolanaClient;
+use branchia::SolanaClient;
 
 let client = SolanaClient::new("https://private-solana-rpc-provider.com");
 ```
@@ -94,7 +94,7 @@ let client = SolanaClient::new("https://private-solana-rpc-provider.com");
 After you have a Solana rpc connection, you can make all the [JSON RPC method](https://solana.com/docs/rpc) calls directly off of it.
 
 ```rust
-use gill::SolanaClient;
+use branchia::SolanaClient;
 
 let client = SolanaClient::new("devnet");
 
@@ -112,7 +112,7 @@ let latest_blockhash = client.rpc.get_latest_blockhash();
 Quickly create a Solana transaction:
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let tx = TxBuilder::new(
   fee_payer,
@@ -131,7 +131,7 @@ let tx = TxBuilder::new(
 
 ```rust
 
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let tx = TxBuilder::new(...);
 let signed_tx = tx.sign(signers, latest_blockhash);
@@ -142,7 +142,7 @@ let signed_tx = tx.sign(signers, latest_blockhash);
 To simulate a transaction on the blockchain, you can use the `simulate_transaction` method on the initialized `SolanaClient`
 
 ```rust
-use gill::{...};
+use branchia::{...};
 
 let client = SolanaClient::new("devnet");
 let tx = TxBuilder::new(...);
@@ -159,7 +159,7 @@ To send and confirm a transaction to the blockchain, you can use the sendAndConf
 The default commitment level is processed, to set another level check out - **COMING SOON!**
 
 ```rust
-use gill::{...};
+use branchia::{...};
 
 let client = SolanaClient::new("devnet");
 let tx = TxBuilder::new(...);
@@ -178,7 +178,7 @@ After you have a transaction signed by the `feePayer` (either a partially or ful
 transaction signature as follows:
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let tx = TxBuilder::new(...);
 let signed_tx = tx.sign(...);
@@ -199,7 +199,7 @@ Craft a Solana Explorer link for transactions, accounts, or blocks on any cluste
 To get an explorer link for a transaction's signature (aka transaction id):
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let url = TxBuilder::get_explorer_link_transaction(cluster, signature);
 ```
@@ -211,7 +211,7 @@ If you have a partially or fully signed transaction, you can get the Explorer li
 > See [`Get Signature from a Signed Transaction`](#get-the-signature-from-a-signed-transaction) for better understanding.
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let tx = TxBuilder::new(...);
 let signed_tx = tx.sign(...);
@@ -225,7 +225,7 @@ let url = TxBuilder::get_explorer_link_transaction("localnet", &signed_tx.signat
 To get an explorer link for an account on Solana's devnet:
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let url = TxBuilder::get_explorer_link_account("devnet", "Bf8PxxWt7UTvNGcrDyNwQiERSwNroa4pEo1pxwKo17Uh");
 ```
@@ -235,7 +235,7 @@ let url = TxBuilder::get_explorer_link_account("devnet", "Bf8PxxWt7UTvNGcrDyNwQi
 To get an explorer link for a block:
 
 ```rust
-use gill::TxBuilder;
+use branchia::TxBuilder;
 
 let url = TxBuilder::get_explorer_link_block("localnet", 2345);
 ```
@@ -247,7 +247,7 @@ To calculate the minimum rent balance for an account (aka data storage deposit f
 #### For default rent
 
 ```rust
-use gill::Rent;
+use branchia::Rent;
 
 let rent = Rent::default().minimum_balance(0);
 // Expected value: 890880
@@ -256,7 +256,7 @@ let rent = Rent::default().minimum_balance(0);
 #### Rent for specified number of bytes
 
 ```rust
-use gill::Rent;
+use branchia::Rent;
 
 let rent = Rent::default().minimum_balance(50);
 // Expected value: 1238880
@@ -265,7 +265,7 @@ let rent = Rent::default().minimum_balance(50);
 ## Loading a keypair from a file
 
 ```rust
-use gill::{Keypair, KeypairExt};
+use branchia::{Keypair, KeypairExt};
 
 let signer = Keypair::from_default_file();
 ```
@@ -279,7 +279,7 @@ By default, the keypair file loaded is the Solana CLI's default keypair: ~/.conf
 To load a Signer from a specific filepath:
 
 ```rust
-use gill::Keypair;
+use branchia::Keypair;
 
 let signer = Keypair::from_default_file(path);
 ```
@@ -289,8 +289,96 @@ let signer = Keypair::from_default_file(path);
 Save a Keypair to a local json file(e.g keypair.json)
 
 ```rust
-use gill::Keypair;
+use branchia::Keypair;
 
 let signer = Keypair::new();
 signer.write_to_file(path);
+```
+
+## Transaction Builders
+
+### Create a token with metadata
+
+Build a transaction that can create a token with metadata, either using the
+[original token](https://github.com/solana-program/token) or
+[token extensions (token22)](https://github.com/solana-program/token-2022) program. - **COMING SOON!**
+
+- Tokens created with the original token program (`TOKEN_PROGRAM_ADDRESS`, default) will use Metaplex's Token Metadata
+  program for onchain metadata
+- Tokens created with the token extensions program (`TOKEN_2022_PROGRAM_ADDRESS`) will use the metadata pointer
+  extensions - **COMING SOON!**
+  INSTRUCTION BUILDERS - **COMING SOON!**
+
+```rust
+use branchia:{TxBuilder, MetadataArgs};
+
+let create_token_tx = TxBuilder::create_token_transaction(
+  fee_payer,
+  latest_blockhash,
+  mint,
+  MetadataArgs{
+    name
+    symbol
+    uri
+    is_mutable // if the `updateAuthority` can change this metadata in the future
+  },
+  decimals,
+  tokenProgram //just the regular token program, no token 2022 support yet
+)
+
+// ADD DEFAULT VALUES FOR CERTAIN FIELDS HERE? - TBD!
+
+```
+
+### Mint tokens to destination wallet
+
+Build a transaction that mints new tokens to the `destination` wallet address (raising the token's overall supply).
+
+- ensure you set the correct `tokenProgram` used by the `mint` itself
+- if the `destination` owner does not have an associated token account (ata) created for the `mint`, one will be
+  auto-created for them
+- ensure you take into account the `decimals` for the `mint` when setting the `amount` in this transaction
+
+```rust
+use branchia::TxBuilder;
+
+let mint_tokens_tx = TxBuilder::mint_token_transaction(
+  fee_payer,
+  latest_blockhash,
+  mint,
+  mint_authority,
+  amount,// note: be sure to consider the mint's `decimals` value
+  // if decimals=2 => this will mint 10.00 tokens
+  // if decimals=4 => this will mint 0.100 tokens
+  destination, // use the correct token program for the `mint`
+  token_program //just the regular token program, no token 2022 support yet
+)
+
+```
+
+### Transfer tokens to a destination wallet
+
+Build a transaction that transfers tokens to the `destination` wallet address from the `source` (aka from `sourceAta` to
+`destinationAta`).
+
+- ensure you set the correct `tokenProgram` used by the `mint` itself
+- if the `destination` owner does not have an associated token account (ata) created for the `mint`, one will be
+  auto-created for them
+- ensure you take into account the `decimals` for the `mint` when setting the `amount` in this transaction
+
+```rust
+use branchia::{TxBuilder}
+
+let transfer_tokens_tx = TxBuilder::transfer_token_transaction(
+  fee_payer,
+  latest_blockhash,
+  mint,
+  authority,
+  amount: 900, // note: be sure to consider the mint's `decimals` value
+  // if decimals=2 => this will transfer 9.00 tokens
+  // if decimals=4 => this will transfer 0.090 tokens
+  destination,   // use the correct token program for the `mint`
+  token_program
+)
+
 ```
