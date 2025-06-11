@@ -14,15 +14,3 @@ pub use solana_signer::Signer;
 pub use spl_token::ID as TOKEN_PROGRAM_ADDRESS;
 pub use spl_token_2022::ID as TOKEN_2022_PROGRAM_ADDRESS;
 pub use transaction::{TxBuilder, MetadataArgs};
-
-pub fn testing() {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_run_this() {
-        testing(); // This will execute when running `cargo test`
-    }
-}
